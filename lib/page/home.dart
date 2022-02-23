@@ -1,17 +1,44 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:soth_hak/model/category_img.dart';
 import 'package:soth_hak/model/food_model.dart';
+import 'package:soth_hak/model/foodmodel.api.dart';
 import 'package:soth_hak/page/category.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  List<Foodmodel> _foodModel = [];
+  bool _isloading = true;
+  @override
+  void initState() {
+    print("Init State");
+    super.initState();
+    getReciepes();
+  }
+  Future<void> getReciepes() async{
+      print("Get reciepes Execute");
+      _foodModel = await FoodModelApi.getModel();
+      setState(() {
+        _isloading = false;
+      });
+      print(_foodModel);
+  }
+  @override
+  
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: _isloading 
+        ?Center(child: CircularProgressIndicator())
+        : Container(
         color: Color.fromARGB(255, 255, 255, 255),
         child: Center(
           child: CustomScrollView(
@@ -22,11 +49,11 @@ class Home extends StatelessWidget {
           ),
         ),
       ),
+     
     );
   }
-}
-
-SliverToBoxAdapter buildHeader() {
+  
+  SliverToBoxAdapter buildHeader() {
   return SliverToBoxAdapter(
     child: Container(
       margin: EdgeInsets.fromLTRB(15, 50, 0, 0),
@@ -62,7 +89,6 @@ SliverToBoxAdapter buildHeader() {
     ),
   );
 }
-
 SliverFixedExtentList buildMenu() {
   return SliverFixedExtentList(
     delegate: SliverChildBuilderDelegate((context, index) {
@@ -71,13 +97,13 @@ SliverFixedExtentList buildMenu() {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => Category(
                     index: index,
-                    title: foodModel[index].title,
-                    categoryPic: catePic[index].img1,
+                    title: _foodModel[index].title,
+                    categoryPic: _foodModel[index].img,
                     time: foodModel[index].time,
                   )));
         },
         child: Hero(
-          tag: foodModel[index].id,
+          tag: _foodModel[index].id,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -85,7 +111,7 @@ SliverFixedExtentList buildMenu() {
               image: DecorationImage(
                 fit: BoxFit.cover,
                 image: NetworkImage(
-                  foodModel[index].img,
+                  _foodModel[index].img,
                 ),
               ),
             ),
@@ -105,18 +131,18 @@ SliverFixedExtentList buildMenu() {
                     child: Stack(
                       children: [
                         Text(
-                          foodModel[index].title,
-                          style: TextStyle(fontSize: 20),
+                          _foodModel[index].title,
+                          style: TextStyle(fontSize: 18),
                         ),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(0, 30, 20, 10),
-                          child: Text(
-                            foodModel[index].detail,
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 136, 117, 117),
-                            ),
-                          ),
-                        )
+                        // Container(
+                        //   margin: EdgeInsets.fromLTRB(0, 30, 20, 10),
+                        //   child: Text(
+                        //     foodModel[index].detail,
+                        //     style: TextStyle(
+                        //       color: Color.fromARGB(255, 136, 117, 117),
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
@@ -126,13 +152,13 @@ SliverFixedExtentList buildMenu() {
           ),
         ),
       );
-    }, childCount: foodModel.length),
+    },
+    childCount: _foodModel.length),
     itemExtent: 290.0,
   );
 }
-// Image.network(
-//               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkpHCGUepyja_eF2w1T-F40NtrU_XGTtznIw&usqp=CAU',
-//               fit: BoxFit.cover,
-//               width: 340,
-//               height: 280,
-//             ),
+}
+
+
+
+

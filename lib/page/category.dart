@@ -10,7 +10,7 @@ class Category extends StatelessWidget {
   int index;
   String title;
   String categoryPic;
-  String time;
+  int time;
   Category(
       {Key? key,
       required this.index,
@@ -97,7 +97,7 @@ class Category extends StatelessWidget {
                     width: 20,
                   ),
                   Text(
-                    time,
+                    time.toString(),
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -116,7 +116,7 @@ class Category extends StatelessWidget {
         height: 280,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: catePic.length,
+          itemCount: 1,
           itemBuilder: (context, index) {
             return Container(
               color: Color.fromARGB(255, 250, 249, 249),

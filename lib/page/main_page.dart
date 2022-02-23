@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:soth_hak/page/category.dart';
 import 'package:soth_hak/page/home.dart';
+import 'package:soth_hak/page/profile.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -14,6 +15,8 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   final screens = [
     Home(),
+    ProfileWidget()
+
   ];
   int currentIndex = 0;
   @override
