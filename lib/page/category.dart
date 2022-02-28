@@ -1,26 +1,60 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, deprecated_member_use
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
-import 'package:soth_hak/model/category_img.dart';
-import 'package:soth_hak/model/food_model.dart';
-import 'package:soth_hak/page/main_page.dart';
+import 'package:http/http.dart';
+import 'package:soth_hak/model/nutrition.api.dart';
+import 'package:soth_hak/model/nutrition_model.dart';
+
+import '../model/food_model.dart';
+import 'main_page.dart';
 
 // ignore: must_be_immutable
-class Category extends StatelessWidget {
+class Category extends StatefulWidget {
+  int id;
   int index;
   String title;
   String categoryPic;
   int time;
   Category(
       {Key? key,
+      required this.id,
       required this.index,
       required this.title,
       required this.categoryPic,
       required this.time})
       : super(key: key);
+
+  @override
+  State<Category> createState() => _CategoryState();
+}
+
+class _CategoryState extends State<Category> {
+  List<NutritionModel> _goodModel = [];
+
+  bool _loading = true;
+  @override
+  void initState(){
+    print("Init Category ");
+    super.initState();
+    getData();
+
+  }
+  Future<void> getData() async{
+    _goodModel = await NutriModelApi.getGoodNutri(widget.id.toString());
+    // _badModel = await NutriModelApi.getBadNutri(widget.id);
+    // calories = await NutriModelApi.getCalories(widget.id);
+    setState(() {
+      _loading = false;
+    });
+    print(_goodModel);
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _loading
+          ? Center(child: CircularProgressIndicator())
+          :Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -74,13 +108,13 @@ class Category extends StatelessWidget {
   SliverToBoxAdapter buildHead(BuildContext context) {
     return SliverToBoxAdapter(
       child: Hero(
-        tag: foodModel[index].id,
+        tag: widget.id,
         child: Stack(
           children: [
             Container(
               margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
               child: Text(
-                title,
+                widget.title,
                 style: TextStyle(fontSize: 30),
               ),
             ),
@@ -97,7 +131,7 @@ class Category extends StatelessWidget {
                     width: 20,
                   ),
                   Text(
-                    time.toString(),
+                    widget.time.toString(),
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -133,7 +167,7 @@ class Category extends StatelessWidget {
                       topRight: Radius.circular(30),
                     ),
                     child: Image.network(
-                      categoryPic,
+                      widget.categoryPic,
                       width: 390,
                       height: 250,
                       fit: BoxFit.cover,
@@ -155,13 +189,13 @@ class Category extends StatelessWidget {
           Container(
             alignment: Alignment.topLeft,
             margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
-            child: Text('About meal',
+            child: Text('Ingredient',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
             child: Text(
-                'asdfasdfadsfadsfadsfadsfhasdfjhaskdjdasffffffffffadadfxdfgsfdgsfasdadfadsf'),
+                ''),
           ),
           Container(
             alignment: Alignment.topLeft,
@@ -169,10 +203,23 @@ class Category extends StatelessWidget {
             child: Text('Vitamin',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           ),
-          Container(
-            margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: Text(
-                'asdfasdfadsfadsfadsfadsfhasdfjhaskdjdasffffffffffadadfxdfgsfdgsfasdadfadsf'),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
+              child: Row(
+                children: [
+              for ( int i = 0; i<=_goodModel[widget.index].good.length-1;i++ )
+                Text(_goodModel[0].good[i]["title"]),
+                
+                // Text(_goodModel[widget.index].good[0]["title"]),
+                ]
+              ),
+              // child: Text(
+                
+              //   _goodModel[widget.index].good[1]["title"]
+              //   ),
+            ),
           ),
           Container(
             alignment: Alignment.topLeft,
@@ -182,8 +229,8 @@ class Category extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: Text(
-                'asdfasdfadsfadsfadsfadsfhasdfjhaskdjdasffffffffffadadfxdfgsfdgsfasdadfadsf'),
+            child: Text(_goodModel[0].calories
+                ),
           ),
           Container(
             alignment: Alignment.topLeft,

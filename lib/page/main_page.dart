@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_void_to_null
 
 import 'package:flutter/material.dart';
-import 'package:soth_hak/page/category.dart';
-import 'package:soth_hak/page/home.dart';
-import 'package:soth_hak/page/profile.dart';
+
+import 'home.dart';
+import 'profile.dart';
+import 'profile.dart';
+
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -30,6 +32,7 @@ class _HomepageState extends State<Homepage> {
   BottomNavigationBar buildBottom(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
+      
       items: [
         BottomNavigationBarItem(
             icon: IconButton(

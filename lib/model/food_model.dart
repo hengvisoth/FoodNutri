@@ -20,6 +20,7 @@ class Foodmodel {
       );
   }
   static List<Foodmodel> foodFromSnapShot(List snapshot){
+    print("Snap Shot ${snapshot}");
      return snapshot.map((data) {
        return Foodmodel.fromJson(data);
      }).toList();

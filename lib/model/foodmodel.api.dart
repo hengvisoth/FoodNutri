@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:soth_hak/model/food_model.dart';
+
+import 'food_model.dart';
+
 
 class FoodModelApi{
   static Future<List<Foodmodel>> getModel() async{
