@@ -19,28 +19,13 @@ class NutriModelApi{
     });
    
     Map _data = jsonDecode(_response.body);
-    print("Data$_data");
     List allData = [] ; 
     allData.add(_data);
-    // List good = [];
-    // List bad = [];
-    // List calories = [];
-    // for(var i in _data['good']){
-    //   good.add(i);
-    // }
-    // for(var i in _data['bad']){
-    //   bad.add(i);
-    // }
-    // for(var i in _data['calories']){
-    //   calories.add(i);
-    // }
-
-    // print("Good$good");
     return NutritionModel.nutriFromSnapshot(allData);
   }
-  // static Future<List<NutritionModel>> getBadNutri(id) async{
-  //   var uri = Uri.https("https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com", "recipes/1003464/nutritionWidget.json",{
-  //     "id" : "1003464"
+  // static Future<List<NutritionModel>> getBadNutri(String id) async{
+  //   var uri = Uri.https("https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com", "recipes/$id/nutritionWidget.json",{
+  //     "id" : id
   //   });
   //   final _response = await http.get(uri,headers: {
   //     	"x-rapidapi-host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",

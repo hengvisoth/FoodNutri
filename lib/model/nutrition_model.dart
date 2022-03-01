@@ -9,7 +9,7 @@ class NutritionModel{
   NutritionModel({
     required this.calories,
     required this.bad,
-    required this.good
+    required this.good,
   });
   
   factory NutritionModel.fromJson(dynamic json){
@@ -17,13 +17,12 @@ class NutritionModel{
     return NutritionModel(
       calories: json["calories"] as String, 
       bad: json["bad"] as List,
-      good: json["good"] as List
-      
+      good: json["good"] as List,
       );
   
       }
     static List<NutritionModel> nutriFromSnapshot(List snapshot){
-      print("Snap Shot ${snapshot}");
+      print("SnampShot$snapshot");
       return snapshot.map((data){
       
         return NutritionModel.fromJson(data);
@@ -31,6 +30,6 @@ class NutritionModel{
     }
     @override
     String toString(){
-      return 'Nutrition {calories : $calories, bad : $bad, good : $good';
+      return 'Nutrition {calories : $calories, bad : $bad, good : $good,';
     }
 }

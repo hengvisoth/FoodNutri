@@ -42,6 +42,7 @@ class _CategoryState extends State<Category> {
 
   }
   Future<void> getData() async{
+    print(widget.id.toString().runtimeType);
     _goodModel = await NutriModelApi.getGoodNutri(widget.id.toString());
     // _badModel = await NutriModelApi.getBadNutri(widget.id);
     // calories = await NutriModelApi.getCalories(widget.id);
@@ -157,7 +158,6 @@ class _CategoryState extends State<Category> {
               margin: EdgeInsets.fromLTRB(15, 20, 25, 3),
               width: 390,
               child: Column(
-                // ignore: prefer_const_literals_to_create_immutables
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.only(
@@ -192,6 +192,16 @@ class _CategoryState extends State<Category> {
             child: Text('Ingredient',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           ),
+          // Container(
+          //     margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
+          //     child: Column(
+          //       children: [
+          //     for ( int i = 0; i<=10;i++ )
+          //       Text(_goodModel[0].good[i]["ingredient"]),                
+          //       ]
+          //     ),
+          //   ),
+          
           Container(
             margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
             child: Text(
@@ -203,24 +213,15 @@ class _CategoryState extends State<Category> {
             child: Text('Vitamin',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
+          Container(
               margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-              child: Row(
+              child: Column(
                 children: [
-              for ( int i = 0; i<=_goodModel[widget.index].good.length-1;i++ )
-                Text(_goodModel[0].good[i]["title"]),
-                
-                // Text(_goodModel[widget.index].good[0]["title"]),
+              for ( int i = 0; i<=10;i++ )
+                Text(_goodModel[0].good[i]["title"]),                
                 ]
               ),
-              // child: Text(
-                
-              //   _goodModel[widget.index].good[1]["title"]
-              //   ),
             ),
-          ),
           Container(
             alignment: Alignment.topLeft,
             margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
@@ -235,46 +236,6 @@ class _CategoryState extends State<Category> {
           Container(
             alignment: Alignment.topLeft,
             margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
-            child: Text('Recommendation',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          ),
-          Container(
-            margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: Text(
-                'asdfasdfadsfadsfadsfadsfhasdfjhaskdjdasffffffffffadadfxdfgsfdgsfasdadfadsf'),
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
-            child: Text('White wine vinegar',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.fromLTRB(25, 25, 0, 0),
-            child: Text('asdfasdfadsfadsfadsfa'),
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
-            child: Text('Fresh basil',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: Text('asdfasdfadsfadsfadsfads'),
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.fromLTRB(25, 15, 0, 0),
-            child: Text('Penne pasta',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-            child: Text('asdfasdfadsfadsf'),
           ),
           Container(
             alignment: Alignment.topLeft,
