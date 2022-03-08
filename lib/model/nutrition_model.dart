@@ -1,15 +1,15 @@
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 
 class NutritionModel{
   String calories;
   List bad;
   List good;
+  String protein;
   NutritionModel({
     required this.calories,
     required this.bad,
     required this.good,
+    required this.protein
   });
   
   factory NutritionModel.fromJson(dynamic json){
@@ -18,6 +18,7 @@ class NutritionModel{
       calories: json["calories"] as String, 
       bad: json["bad"] as List,
       good: json["good"] as List,
+      protein : json["protein"] as String
       );
   
       }
@@ -30,6 +31,6 @@ class NutritionModel{
     }
     @override
     String toString(){
-      return 'Nutrition {calories : $calories, bad : $bad, good : $good,';
+      return 'Nutrition {calories : $calories, bad : $bad, good : $good, protein : $protein';
     }
 }

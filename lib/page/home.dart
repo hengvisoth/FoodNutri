@@ -1,15 +1,24 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers
 
-import 'dart:ffi';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
+import 'package:intl/intl.dart';
 
+import 'package:get/get.dart';
+
+import '../controller/amount_controller.dart';
 import '../model/food_model.dart';
 import '../model/foodmodel.api.dart';
+import '../model/meals_today.dart';
+import '../model/meals_today_api.dart';
+import '../widget/custom_progress.dart';
 import 'category.dart';
 
 class Home extends StatefulWidget {
+  
   const Home({Key? key}) : super(key: key);
 
   @override
@@ -17,57 +26,108 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Foodmodel> _foodModel = [];
+  
+  List<Foodmodel> foodModel = [];
+  List<Foodmodel> temp = [];
+
+  List<TodaysMealModel> _mealsPlanModel = [];
+  List<Foodmodel> _searchResult = [];
   bool _isloading = true;
+  var getController = Get.put(AmountController());
+  var proteinAmount; 
+  var calAmount;
+  
   @override
   void initState() {
-    print("Init State");
     super.initState();
     getReciepes();
+    generateMealsPlan();
+    
   }
+   
 
   Future<void> getReciepes() async {
     print("Get reciepes Execute");
-    _foodModel = await FoodModelApi.getModel();
+    temp = await FoodModelApi.getModel();
+    foodModel.addAll(temp);
     setState(() {
       _isloading = false;
     });
-    print("Food Model$_foodModel");
+  }
+
+  Future<void> generateMealsPlan() async {
+    _mealsPlanModel = await MealsTodayApi.getModel();
+    setState(() {
+      _isloading = false;
+    });
+  }
+
+  Future<void> update() async{
+    print("update execute");
+    proteinAmount = getController.protein;
+    calAmount = getController.calories;
+    print(proteinAmount);
+    print(calAmount);
   }
 
   @override
   Widget build(BuildContext context) {
+    proteinAmount = getController.protein.toString();
+    calAmount = getController.calories.toString();
+    TimeOfDay releaseTime = TimeOfDay(hour: 15, minute: 0);
+    final now = DateTime.now();
+
     return Scaffold(
       body: _isloading
           ? Center(child: CircularProgressIndicator())
-          : Container(
-              color: Color.fromARGB(255, 255, 255, 255),
-              child: Center(
-                child: CustomScrollView(
-                  slivers: [
-                    // defualtAppBar(),
-                    buildHeader(),
-                    container("TrendingFood"),
-
-                    buildMenu1(),
-                    container("Meals For Today")
-                  ],
+          : RefreshIndicator(
+            onRefresh: () async{
+              update();
+            },
+            child: Container(
+                color: Color.fromARGB(255, 255, 255, 255),
+                child: Center(
+                  child: CustomScrollView(
+                    slivers: [
+                      // defualtAppBar(),
+                      buildHeader(context, calAmount, proteinAmount),
+                      container("Meals For Today"),
+          
+                      buildMenu1(),
+                      container("Random Healthy Reciepes"),
+          
+                      buildMenu(context),
+                      seeMoreButton()
+                    ],
+                  ),
                 ),
               ),
-            ),
+          ),
     );
   }
+  SliverToBoxAdapter seeMoreButton(){
+    return SliverToBoxAdapter(
+      child: TextButton(
+        child: Text("See More"),
+        onPressed: (){
+          _isloading = true;
+          getReciepes();
+          _isloading = false;
+        },
 
+      )
+    );
+
+  }
   SliverToBoxAdapter container(String title) {
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.fromLTRB(18, 8, 12, 8),
-        // margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
         child: Text(
           title,
           style: TextStyle(
               color: Colors.blueGrey,
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.1),
         ),
@@ -75,45 +135,93 @@ class _HomeState extends State<Home> {
     );
   }
 
-  SliverAppBar defualtAppBar() {
-    return SliverAppBar(
-      pinned: false,
-      // expandedHeight: MediaQuery.of(context).size.height*0.35,
-      flexibleSpace: FlexibleSpaceBar(
-        title: AppBar(
-          backgroundColor: Colors.transparent,
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-          elevation: 0,
-          title: Text("HomePage"),
-          centerTitle: true,
-          leading: Icon(Icons.person),
-        ),
-      ),
-    );
-  }
+  // SliverAppBar defualtAppBar() {
+  //   return SliverAppBar(
+  //     pinned: false,
+  //     flexibleSpace: FlexibleSpaceBar(
+  //       title: AppBar(
+  //         backgroundColor: Colors.transparent,
+  //         systemOverlayStyle: SystemUiOverlayStyle.dark,
+  //         elevation: 0,
+  //         title: Text("HomePage"),
+  //         centerTitle: true,
+  //         leading: Icon(Icons.person),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  SliverToBoxAdapter buildHeader() {
+  SliverToBoxAdapter buildHeader(
+    BuildContext context, String calAmount, String porteinAmount) {
+    var controller = TextEditingController();
+    final today = DateTime.now();
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    print(calAmount);
+    print(porteinAmount);
     return SliverToBoxAdapter(
       child: Container(
-        margin: EdgeInsets.fromLTRB(15, 15, 0, 0),
+        margin: EdgeInsets.fromLTRB(15, 30, 0, 0),
         child: Stack(
-          // ignore: prefer_const_literals_to_create_immutables
           children: [
-            Text(
-              'Find the Best\nHealthy Food ',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Container(
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(20)),
-              margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search food here',
-                  prefixIcon: (Icon(Icons.search)),
-                  disabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                  bottom: const Radius.circular(40)),
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.only(
+                    top: 40, left: 16, right: 16, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    ListTile(
+                      title: Text(
+                        DateFormat("EEEE").format(today) +
+                            DateFormat("d MMMM").format(today),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 25),
+                      ),
+                      subtitle: Text(
+                        "Welcome User",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 26,
+                            color: Colors.black),
+                      ),
+                      trailing: ClipOval(
+                        child: Image.network(
+                            "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        RadialProgressCalories(
+                          height: width * 0.1,
+                          width: width * 0.05,
+                          color: Color.fromARGB(255, 75, 15, 121),
+                          amount: int.parse(calAmount),
+                          text: "kcal",
+                          divider: 2000,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        RadialProgressProtein(
+                          height: width * 0.1,
+                          width: width * 0.05,
+                          color: Color.fromARGB(255, 18, 18, 125),
+                          amount: int.parse(porteinAmount),
+                          text: "grams",
+                          divider: 56,
+                        ),
+                      ],
+                    ),
+                    
+                  ],
                 ),
               ),
             ),
@@ -124,28 +232,29 @@ class _HomeState extends State<Home> {
   }
 
   SliverToBoxAdapter buildMenu1() {
+    List dishTime = ["BreakFast", "Lunch", "Dinner"];
     return SliverToBoxAdapter(
       child: Container(
         height: 250,
-        margin: EdgeInsets.fromLTRB(30, 0, 30, 0),
+        margin: EdgeInsets.fromLTRB(30, 10, 30, 15),
         child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _foodModel.length,
+            itemCount: _mealsPlanModel.length,
             itemBuilder: (context, index) {
               return Row(children: [
                 InkWell(
-                  onTap: () {
+                  onTap: () async{
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => Category(
-                              index: index,
-                              id: _foodModel[index].id,
-                              title: _foodModel[index].title,
-                              categoryPic: _foodModel[index].img,
-                              time: _foodModel[index].time,
+                       builder: (context) =>Category(
+                              id: _mealsPlanModel[index].id,
+                              title: _mealsPlanModel[index].title,
+                              categoryPic:
+                                  "https://spoonacular.com/recipeImages/${_mealsPlanModel[index].id}-556x370.jpg",
+                              time: _mealsPlanModel[index].time,
                             )));
                   },
                   child: Hero(
-                    tag: _foodModel[index].id,
+                    tag: _mealsPlanModel[index].id,
                     child: Material(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                       elevation: 4,
@@ -157,8 +266,10 @@ class _HomeState extends State<Home> {
                             child: ClipRRect(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20)),
-                                child: Image.network(_foodModel[index].img,
-                                    width: 145, fit: BoxFit.cover)),
+                                child: Image.network(
+                                    "https://spoonacular.com/recipeImages/${_mealsPlanModel[index].id}-556x370.jpg",
+                                    width: 145,
+                                    fit: BoxFit.cover)),
                           ),
                           Flexible(
                             fit: FlexFit.tight,
@@ -169,7 +280,7 @@ class _HomeState extends State<Home> {
                                 SizedBox(
                                   width: 120,
                                   child: (Text(
-                                    _foodModel[index].title.toString(),
+                                    _mealsPlanModel[index].title.toString(),
                                     maxLines: 2,
                                     style: TextStyle(
                                         color: Colors.black87,
@@ -178,25 +289,30 @@ class _HomeState extends State<Home> {
                                         letterSpacing: 1.1),
                                   )),
                                 ),
-                                Row(children: const [
+                                Row(children: [
+                                  SizedBox(
+                                    width: 4,
+                                  ),
                                   Text(
-                                    "Calories: ",
+                                    "DishTypes: ",
                                     style: TextStyle(
                                         color: Colors.black38,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        letterSpacing: 1.1),
+                                        letterSpacing: 1),
                                   ),
                                   Text(
-                                    "512 Kcal",
+                                    dishTime[index],
                                     style: TextStyle(
                                         color: Colors.black38,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        letterSpacing: 1.1),
+                                        letterSpacing: 1),
                                   ),
-                                ])
-                                ,
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                ]),
                                 Row(
                                   children: [
                                     Icon(Icons.lock_clock),
@@ -204,7 +320,7 @@ class _HomeState extends State<Home> {
                                       width: 10,
                                     ),
                                     Text(
-                                      "${_foodModel[index].time.toString()} min",
+                                      "${_mealsPlanModel[index].time.toString()} min",
                                       style: TextStyle(
                                           color: Colors.black54,
                                           fontSize: 14,
@@ -230,69 +346,96 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // SliverFixedExtentList buildMenu() {
-  //   return SliverFixedExtentList(
-  //     delegate: SliverChildBuilderDelegate((context, index) {
-  //       return InkWell(
-  //         onTap: () {
-  //           Navigator.of(context).push(MaterialPageRoute(
-  //               builder: (context) => Category(
-  //                     index: index,
-  //                     id: _foodModel[index].id,
-  //                     title: _foodModel[index].title,
-  //                     categoryPic: _foodModel[index].img,
-  //                     time: foodModel[index].time,
-  //                   )));
-  //         },
-  //         child: Hero(
-  //           tag: _foodModel[index].id,
-  //           child: Container(
-  //             margin: EdgeInsets.fromLTRB(20, 20, 20, 10),
-  //             alignment: Alignment.center,
-  //             child: Stack(
-  //               children: [
-  //                 Container(
-  //                   height: 300,
-  //                   width: 100,
-  //                   decoration: BoxDecoration(
-  //                     borderRadius: BorderRadius.circular(20),
-  //                     color: Colors.amber,
-  //                     image: DecorationImage(
-  //                       fit: BoxFit.contain,
-  //                       image: NetworkImage(
-  //                         _foodModel[index].img,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-
-  // Container(
-  //   decoration: BoxDecoration(
-  //     borderRadius: BorderRadius.circular(20),
-  //     color: Color.fromARGB(230, 255, 255, 255),
-  //   ),
-  //   width: 300,
-  //   margin: EdgeInsets.fromLTRB(20, 150, 20, 15),
-  //   child: Container(
-  //     padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-  //     child: Stack(
-  //       children: [
-  //         Text(
-  //           _foodModel[index].title,
-  //           style: TextStyle(fontSize: 18),
-  //         ),
-
-  //       ],
-  //     ),
-  //   ),
-  // ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         );
-//       }, childCount: _foodModel.length.compareTo(0)),
-//       itemExtent: 100.0,
-//     );
-//   }
+  SliverFixedExtentList buildMenu(BuildContext context) {
+    return SliverFixedExtentList(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return InkWell(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => Category(
+                      id: foodModel[index].id,
+                      title: foodModel[index].title,
+                      categoryPic: foodModel[index].img,
+                      time: foodModel[index].time,
+                    )));
+          },
+          child: Hero(
+            tag: foodModel[index].id,
+            child: Container(
+              margin: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              alignment: Alignment.center,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.grey,
+                      image: DecorationImage(
+                        fit: BoxFit.fill,
+                        image: NetworkImage(
+                          "https://spoonacular.com/recipeImages/${foodModel[index].id}-556x370.jpg",
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(const Radius.circular(40)),
+                          child: Container(
+                            decoration: BoxDecoration(color: Colors.black),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.schedule,
+                                  color: Colors.yellow,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "${foodModel[index].time} min",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Color.fromARGB(149, 81, 78, 78),
+                    ),
+                    margin: EdgeInsets.fromLTRB(20, 150, 20, 15),
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          foodModel[index].title,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }, childCount: foodModel.length),
+      itemExtent: 290.0,
+    );
+  }
 }

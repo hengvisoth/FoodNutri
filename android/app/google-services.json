@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "431457356240",
+    "project_id": "trainingproject-f1f0c",
+    "storage_bucket": "trainingproject-f1f0c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431457356240:android:27fb5fa21cec3388d351d5",
+        "android_client_info": {
+          "package_name": "com.example.soth_hak"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "431457356240-873d4no5mnq7s4qa9orstdd51qtvdpng.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.soth_hak",
+            "certificate_hash": "eb2fa6121ed2054ebc440e7636dcccda830b1fc7"
+          }
+        },
+        {
+          "client_id": "431457356240-3u702grrg9fbgf9vi5d74kbk2n9v85rp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9AjVlwPZ4-e87tB8i8h0bpP-jEXtE3oE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "431457356240-3u702grrg9fbgf9vi5d74kbk2n9v85rp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
